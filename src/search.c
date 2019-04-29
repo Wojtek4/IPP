@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <inttypes.h>
 #include "search.h"
+#include <stdio.h>
 
 const uint64_t MAX_DIST = 18446744073709551615ull;
 const int32_t MAX_AGE = 2147483647;

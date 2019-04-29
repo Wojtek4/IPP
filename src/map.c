@@ -7,6 +7,7 @@
 #include "map.h"
 #include "route.h"
 #include "search.h"
+#include <stdio.h>
 
 struct Map {
     Vector routes;
