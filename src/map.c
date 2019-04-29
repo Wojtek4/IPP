@@ -12,6 +12,7 @@
 struct Map {
     Vector routes;
     TrieTree trieTree;
+    char* array;
 };
 
 Map* newMap() {
@@ -29,6 +30,7 @@ Map* newMap() {
         free(result);
         return NULL;
     }
+    result->array = NULL;
     return result;
 }
 
@@ -37,6 +39,9 @@ void deleteMap(Map *map) {
         deleteRoute(getElement(map->routes, i));
     clear(map->routes);
     removeTrie(map->trieTree);
+    if (map->array != NULL)
+        free(map->array);
+    free(map);
 }
 
 bool badName(const char *city) {
@@ -295,6 +300,8 @@ char const* getRouteDescription(Map *map, unsigned routeId) {
         return NULL;
     uint32_t arrayLength = calcArrayLength(route->objects) + snprintf(NULL, 0, "%" PRIu32, route->id) + 1;
     char* array = calloc(arrayLength, sizeof(char));
+    if (array == NULL)
+        return NULL;
     char* result = array;
     sprintf(array, "%" PRIu32, route->id);
     while (*array != 0)

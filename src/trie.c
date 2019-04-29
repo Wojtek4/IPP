@@ -44,14 +44,14 @@ TrieTree addPath(const char *history, TrieTree trieTree) {
 		for (uint32_t i = 0; i < trieTree->t->numberOfElements; i++) {
 		    TrieEdge currEdge = (TrieEdge) getElement(trieTree->t, i);
 		    if (currEdge->label == *history) {
-                //printf("ide dalej %c, %s\n", *history, history);
+                //printf("ide dalej %d, %s\n", *history, history);
                 nextNode = currEdge->node;
                 break;
             }
 		}
 
 		if (nextNode == NULL) {
-		    //printf("nowy %c, %s\n", *history, history);
+		    //printf("nowy %d, %s\n", *history, history);
 		    nextNode = newTrieNode(trieTree);
             addElement(trieTree->t, newTrieEdge(*history, nextNode));
         }
@@ -98,21 +98,27 @@ void removeTrie(TrieTree trieTree) {
 
 TrieTree findNode(const char *history, TrieTree trieTree) {
 
+    //printf("find node %s\n", history);
+
 	while (*history != 0) {
+	    bool stop = true;
         for (uint32_t i = 0; i < trieTree->t->numberOfElements; i++) {
             TrieEdge currEdge = getElement(trieTree->t, i);
-            //printf("Jestem w %c\n", currEdge->label);
+            //printf("Jestem w %d, %s\n", currEdge->label, history);
             if (currEdge->label == *history) {
                 trieTree = currEdge->node;
                 history++;
-                //printf("IDE %c\n", *history);
+                //printf("IDE %d, %s\n", *history, history);
+                stop = false;
                 break;
             }
         }
-        //printf("STOP\n");
-		return NULL;
+        if (stop) {
+            //printf("Nieznalazlem, %s\n", history);
+            return NULL;
+        }
 	}
-	//printf("DOSZEDLEM\n");
+	//printf("Znalazlem\n\n");
 	return trieTree;
 }
 

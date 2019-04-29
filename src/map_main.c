@@ -13,37 +13,37 @@ int main() {
   Map* m = newMap();
   assert(m);
 
-  assert(addRoad(m, "Alin贸w", "B贸r", 1, 2020));
-  assert(addRoad(m, "B贸r", "Cieli艅sk-Niek艂a艅sk", 2, 2020));
-  assert(addRoad(m, "B贸r", "D膮b Stary", 3, 2020));
-  assert(addRoad(m, "Cieli艅sk-Niek艂a艅sk", "Emiliew", 4, 2020));
-  assert(addRoad(m, "D膮b Stary", "Emiliew", 5, 2020));
-  assert(addRoad(m, "Emiliew", "B贸r", 8, 2020));
-  assert(addRoad(m, "Emiliew", "Fra藕nik Nowy", 3, 2020));
-  assert(!repairRoad(m, "Emiliew", "Cieli艅sk-Niek艂a艅sk", 2019));
-  assert(repairRoad(m, "Emiliew", "Cieli艅sk-Niek艂a艅sk", 2021));
-  assert(!repairRoad(m, "Emiliew", "Alin贸w", 2020));
-  assert(addRoad(m, "Fra藕nik Nowy", "Grzegrzewo", 4, 2020));
-  assert(addRoad(m, "Alin贸w", "Grzegrzewo", 10, 2020));
+  assert(addRoad(m, "Alin體", "B髍", 1, 2020));
+  assert(addRoad(m, "B髍", "Cieli駍k-Niek砤駍k", 2, 2020));
+  assert(addRoad(m, "B髍", "D筨 Stary", 3, 2020));
+  assert(addRoad(m, "Cieli駍k-Niek砤駍k", "Emiliew", 4, 2020));
+  assert(addRoad(m, "D筨 Stary", "Emiliew", 5, 2020));
+  assert(addRoad(m, "Emiliew", "B髍", 8, 2020));
+  assert(addRoad(m, "Emiliew", "Fra焠ik Nowy", 3, 2020));
+  assert(!repairRoad(m, "Emiliew", "Cieli駍k-Niek砤駍k", 2019));
+  assert(repairRoad(m, "Emiliew", "Cieli駍k-Niek砤駍k", 2021));
+  assert(!repairRoad(m, "Emiliew", "Alin體", 2020));
+  assert(addRoad(m, "Fra焠ik Nowy", "Grzegrzewo", 4, 2020));
+  assert(addRoad(m, "Alin體", "Grzegrzewo", 10, 2020));
   assert(addRoad(m, "Homilcin", "Grzegrzewo", 5, 2020));
-  assert(addRoad(m, "Fra藕nik Nowy", "Cieli艅sk-Niek艂a艅sk", 2, 2020));
-  assert(!addRoad(m, "Fra藕nik Nowy", "Cieli艅sk-Niek艂a艅sk", 2, 2020));
-  assert(!addRoad(m, "Cieli艅sk-Niek艂a艅sk", "Fra藕nik Nowy", 2, 2020));
-  assert(!repairRoad(m, "Emiliew", "B贸r", 2018));
-  assert(repairRoad(m, "Emiliew", "Cieli艅sk-Niek艂a艅sk", 2021));
-  assert(repairRoad(m, "Emiliew", "Fra藕nik Nowy", 2023));
-  assert(addRoad(m, "Homilcin", "Cieli艅sk-Niek艂a艅sk", 3, 2020));
-  assert(newRoute(m, 10, "Alin贸w", "Emiliew"));
+  assert(addRoad(m, "Fra焠ik Nowy", "Cieli駍k-Niek砤駍k", 2, 2020));
+  assert(!addRoad(m, "Fra焠ik Nowy", "Cieli駍k-Niek砤駍k", 2, 2020));
+  assert(!addRoad(m, "Cieli駍k-Niek砤駍k", "Fra焠ik Nowy", 2, 2020));
+  assert(!repairRoad(m, "Emiliew", "B髍", 2018));
+  assert(repairRoad(m, "Emiliew", "Cieli駍k-Niek砤駍k", 2021));
+  assert(repairRoad(m, "Emiliew", "Fra焠ik Nowy", 2023));
+  assert(addRoad(m, "Homilcin", "Cieli駍k-Niek砤駍k", 3, 2020));
+  assert(newRoute(m, 10, "Alin體", "Emiliew"));
 
   str = getRouteDescription(m, 10);
-  assert(strcmp(str, "10;Alin贸w;1;2020;B贸r;2;2020;Cieli艅sk-Niek艂a艅sk;4;2021;Emiliew") == 0);
+  assert(strcmp(str, "10;Alin體;1;2020;B髍;2;2020;Cieli駍k-Niek砤駍k;4;2021;Emiliew") == 0);
   free((void *)str);
 
   assert(extendRoute(m, 10, "Homilcin"));
 
   str = getRouteDescription(m, 10);
-  assert(strcmp(str, "10;Alin贸w;1;2020;B贸r;2;2020;Cieli艅sk-Niek艂a艅sk;4;2021;Emiliew"
-                     ";3;2023;Fra藕nik Nowy;4;2020;Grzegrzewo;5;2020;Homilcin") == 0);
+  assert(strcmp(str, "10;Alin體;1;2020;B髍;2;2020;Cieli駍k-Niek砤駍k;4;2021;Emiliew"
+                     ";3;2023;Fra焠ik Nowy;4;2020;Grzegrzewo;5;2020;Homilcin") == 0);
   free((void *)str);
 
   deleteMap(m);
