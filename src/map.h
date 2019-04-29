@@ -14,6 +14,7 @@
 /**
  * Struktura przechowująca mapę dróg krajowych.
  */
+
 typedef struct Map Map;
 
 /** @brief Tworzy nową strukturę.

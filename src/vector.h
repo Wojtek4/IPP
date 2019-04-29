@@ -21,3 +21,4 @@ void reverseVector(Vector vector);
 void replace(Vector vector, uint32_t index, Vector vectorToReplace);
 void deleteByIndex(Vector vector, uint32_t index);
 void deleteByValue(Vector vector, void* value);
+Vector copyVector(Vector vector);

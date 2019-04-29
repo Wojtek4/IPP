@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include "vector.h"
+#include <stdio.h>
 
 Vector newVector() {
 	Vector result = malloc(sizeof(struct vector));
@@ -85,6 +86,8 @@ void replace(Vector vector, uint32_t index, Vector vectorToReplace) {
 }
 
 void deleteByIndex(Vector vector, uint32_t index) {
+    //swapWithLast(vector, index);
+    //popBack(vector);
     replace(vector, index, newVector());
 }
 
@@ -94,5 +97,13 @@ void deleteByValue(Vector vector, void* value) {
             return deleteByIndex(vector, i);
         }
     }
+}
+
+Vector copyVector(Vector vector) {
+    Vector res = newVector();
+    for (uint32_t i = 0; i < vector->numberOfElements; i++) {
+        addElement(res, getElement(vector, i));
+    }
+    return res;
 }
 

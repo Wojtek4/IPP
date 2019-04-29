@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include "city.h"
 #include "road.h"
+#include <stdio.h>
 
 City newCity(TrieTree trieTree) {
     City result = malloc(sizeof(struct city));
@@ -15,6 +16,7 @@ City newCity(TrieTree trieTree) {
 
 void deleteCityIfEmpty(City city) {
     if (city->edges->numberOfElements == 0) {
+        //printf("TAK\n");
         clear(city->edges);
         city->trieTree->city = NULL;
         deleteTrieTreeIfEmpty(city->trieTree);

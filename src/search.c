@@ -1,10 +1,9 @@
 #include <stdlib.h>
-#include <stdio.h>
 #include <inttypes.h>
 #include "search.h"
 
 const uint64_t MAX_DIST = 18446744073709551615ull;
-const int32_t MIN_AGE = -2147483648;
+const int32_t MAX_AGE = 2147483647;
 
 int32_t min(int32_t x1, int32_t x2) {
     return ((x1 < x2) ? x1 : x2);
@@ -13,7 +12,7 @@ int32_t min(int32_t x1, int32_t x2) {
 void clearGraph(City c1, uint64_t setDistance) {
     c1->distance = setDistance;
     c1->numberOfPaths = 0;
-    c1->isInQueue = 0;
+    c1->isInQueue = false;
     c1->minAge = 0;
     for (uint32_t i = 0; i < c1->edges->numberOfElements; i++) {
         Road currRoad = getElement(c1->edges, i);
@@ -28,22 +27,23 @@ void clearGraph(City c1, uint64_t setDistance) {
     }
 }
 
-void findNumberOfPaths(City city) {
+void findNumberOfPaths(City city, int minYear) {
     for (uint32_t i = 0; i < city->edges->numberOfElements; i++) {
         Road currEdge = getElement(city->edges, i);
         City currDest = currEdge->destination;
         if (currDest->isAllowed == false ||
-            currDest->distance != city->distance + currEdge->length)
+            currDest->distance != city->distance + currEdge->length ||
+            currEdge->year < minYear)
             continue;
         if (currDest->numberOfPaths < 2) {
             currDest->numberOfPaths += city->numberOfPaths;
             currDest->numberOfPaths = min(currDest->numberOfPaths, 2);
-            findNumberOfPaths(currDest);
+            findNumberOfPaths(currDest, minYear);
         }
     }
 }
 
-bool findRoute(City begin, City dest, Vector result) {
+bool findRoute(City begin, City dest, Vector result, int minYear) {
     if (begin == dest) {
         addElement(result, dest);
         return true;
@@ -52,10 +52,11 @@ bool findRoute(City begin, City dest, Vector result) {
         Road currEdge = getElement(begin->edges, i);
         City currDest = currEdge->destination;
         if (currDest->isAllowed == false ||
+            currEdge->year < minYear ||
             currDest->numberOfPaths == 2 ||
             currDest->distance != begin->distance + currEdge->length)
             continue;
-        if (findRoute(currDest, dest, result) == true) {
+        if (findRoute(currDest, dest, result, minYear) == true) {
             addElement(result, currEdge);
             addElement(result, begin);
             return true;
@@ -65,11 +66,13 @@ bool findRoute(City begin, City dest, Vector result) {
 }
 
 Vector findPath(City c1, City c2) {
+    if (c1 == c2 || c1->isAllowed == false || c2->isAllowed == false)
+        return newVector();
     clearGraph(c1, MAX_DIST);
     Vector queue = newVector();
     c1->distance = 0;
     c1->numberOfPaths = 1;
-    c1->minAge = MIN_AGE;
+    c1->minAge = MAX_AGE;
     addElement(queue, c1);
     c1->isInQueue = true;
     for (uint32_t i = 0; i < queue->numberOfElements; i++) {
@@ -92,10 +95,15 @@ Vector findPath(City c1, City c2) {
             }
         }
     }
-    findNumberOfPaths(c1);
+    if (c2->distance == 0) {
+        clear(queue);
+        clearGraph(c1, 0);
+        return newVector();
+    }
+    findNumberOfPaths(c1, c2->minAge);
     clear(queue);
     Vector result = newVector();
-    findRoute(c1, c2, result);
+    findRoute(c1, c2, result, c2->minAge);
     reverseVector(result);
     clearGraph(c1, 0);
     return result;
@@ -145,12 +153,15 @@ Vector fixRoute(Route route, Road road) {
 Vector getBetterPath(Vector path1, Vector path2) {
     if (path1 == NULL || path2 == NULL)
         return NULL;
+    if (path1->numberOfElements == 0 && path2->numberOfElements == 0)
+        return NULL;
     if (path1->numberOfElements == 0 && path2->numberOfElements > 0)
-        return path2;
+        return copyVector(path2);
     if (path1->numberOfElements > 0 && path2->numberOfElements == 0)
-        return path1;
+        return copyVector(path1);
+
     int64_t lengthOfPath1 = 0, lengthOfPath2 = 0;
-    int minOfPath1 = MIN_AGE, minOfPath2 = MIN_AGE;
+    int minOfPath1 = MAX_AGE, minOfPath2 = MAX_AGE;
     for (uint32_t i = 1; i < path1->numberOfElements; i+=2) {
         Road currEdge = getElement(path1, i);
         minOfPath1 = min(minOfPath1, currEdge->year);
@@ -165,9 +176,9 @@ Vector getBetterPath(Vector path1, Vector path2) {
         return NULL;
     if (lengthOfPath1 < lengthOfPath2 ||
             (lengthOfPath1 == lengthOfPath2 && minOfPath1 > minOfPath2)) {
-        return path1;
+        return copyVector(path1);
     }
-    return path2;
+    return copyVector(path2);
 }
 
 uint32_t calcArrayLength(Vector objects) {
