@@ -22,16 +22,13 @@ set(CMAKE_C_FLAGS "-std=c11 -Wall -Wextra")
 # Wskazujemy pliki źródłowe.
 set(SOURCE_FILES
     src/map.c
-    src/map.h
     src/map_main.c
-    src/road.h
     src/road.c
-    src/city.h
     src/city.c
-    src/trie.h
     src/trie.c
-    src/vector.h
-    src/vector.c src/route.c src/route.h src/search.c src/search.h)
+    src/vector.c
+    src/route.c
+    src/search.c)
 
 # Wskazujemy plik wykonywalny.
 add_executable(map ${SOURCE_FILES})

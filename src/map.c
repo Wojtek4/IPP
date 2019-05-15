@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <inttypes.h>
+#include <stdio.h>
 #include "vector.h"
 #include "trie.h"
 #include "city.h"
@@ -7,70 +8,98 @@
 #include "map.h"
 #include "route.h"
 #include "search.h"
-#include <stdio.h>
+
+const int MAX_ROUTE_ID = 999;
 
 struct Map {
     Vector routes;
     TrieTree trieTree;
 };
 
+typedef struct trieEdge* TrieEdge;
+
+struct trieEdge {
+    char label;
+    TrieTree node;
+};
+
 Map* newMap() {
+
     Map* result = malloc(sizeof(Map));
     if (result == NULL)
-        return NULL;
+    	return NULL;
+
     result->routes = newVector();
     if (result->routes == NULL) {
         free(result);
         return NULL;
     }
+
     result->trieTree = newTrieRoot();
     if (result->trieTree == NULL) {
         clear(result->routes);
         free(result);
         return NULL;
     }
+
     return result;
 }
 
 void deleteMap(Map *map) {
+
     for (uint32_t i = 0; i < map->routes->numberOfElements; i++)
         deleteRoute(getElement(map->routes, i));
+
     clear(map->routes);
     removeTrie(map->trieTree);
     free(map);
 }
 
 bool badName(const char *city) {
-    for (uint32_t i = 0; true; i++) {
+
+	if (*city == 0)
+        return true;
+
+	for (uint32_t i = 0; true; i++) {
+
         if (city[i] == 0)
             return false;
+
         if (city[i] == ';' || (city[i] < 32 && city[i] >= 0))
             return true;
     }
 }
 
 bool equalNames(const char *s1, const char *s2) {
-    for (uint32_t i = 0; true; i++) {
+
+	for (uint32_t i = 0; true; i++) {
+
         if (s1[i] != s2[i])
             return false;
+
         if (s1[i] == 0)
             return true;
     }
 }
 
 Road findEdge(City v1, City v2) {
-    Vector w1 = v1->edges;
-    for (uint32_t i = 0; i < w1->numberOfElements; i++) {
+
+	Vector w1 = v1->edges;
+
+	for (uint32_t i = 0; i < w1->numberOfElements; i++) {
+
         Road r = getElement(w1, i);
+
         if (r->destination == v2)
             return r;
-    }
-    return NULL;
+	}
+
+	return NULL;
 }
 
 bool addRoad(Map *map, const char *city1, const char *city2, unsigned length, int builtYear) {
 
-    if (badName(city1) || badName(city2) || builtYear == 0 || length == 0 || equalNames(city1, city2))
+	if (badName(city1) || badName(city2) || builtYear == 0 || length == 0 || equalNames(city1, city2))
         return false;
 
     TrieTree v1 = findNode(city1, map->trieTree), v2 = findNode(city2, map->trieTree);
@@ -86,11 +115,13 @@ bool addRoad(Map *map, const char *city1, const char *city2, unsigned length, in
         v1->city = newCity(v1);
     if (v2->city == NULL)
         v2->city = newCity(v2);
-    if (v1->city == NULL || v2->city == NULL)
-        return false;
+
     City c1 = v1->city, c2 = v2->city;
-    if (findEdge(c1 ,c2) != NULL)
-        return false;
+    if (c1 == NULL || c2 == NULL || findEdge(c1 ,c2) != NULL) {
+    	deleteCityIfEmpty(c1);
+    	deleteCityIfEmpty(c2);
+		return false;
+	}
 
     Vector w1 = c1->edges, w2 = c2->edges;
     Road r1 = newRoad(c2, builtYear, length), r2 = newRoad(c1, builtYear, length);
@@ -128,35 +159,42 @@ bool repairRoad(Map *map, const char *city1, const char *city2, int repairYear) 
 }
 
 bool newRoute(Map *map, unsigned routeId, const char *city1, const char *city2) {
-    if (routeId == 0 || routeId >= 1000)
+
+	if (routeId == 0 || routeId > MAX_ROUTE_ID)
         return false;
+
     for (uint32_t i = 0; i < map->routes->numberOfElements; i++) {
         Route currRoute = getElement(map->routes, i);
         if (currRoute->id == routeId)
             return false;
     }
+
     City c1 = getCity(city1, map->trieTree), c2 = getCity(city2, map->trieTree);
     if (c1 == NULL || c2 == NULL || c1 == c2)
         return false;
+
     Route result = newRouteStruct(routeId);
     if (result == NULL)
         return false;
+
     result->objects = findPath(c1, c2);
-    if (result->objects == NULL || result->objects->numberOfElements == 0) {
+    if (result->objects == NULL || result->objects->numberOfElements % 2 == 0) {
         deleteRoute(result);
         return false;
     }
+
     for (uint32_t i = 1; i < result->objects->numberOfElements; i+=2) {
         Road currEdge = getElement(result->objects, i);
         addElement(currEdge->listOfRoutes, result);
     }
+
     addElement(map->routes, result);
     return true;
 }
 
 bool extendRoute(Map *map, unsigned routeId, const char *city) {
 
-    Route route = NULL;
+	Route route = NULL;
     for (uint32_t i = 0; i < map->routes->numberOfElements; i++) {
         Route currRoute = getElement(map->routes, i);
         if (currRoute->id == routeId) {
@@ -189,6 +227,7 @@ bool extendRoute(Map *map, unsigned routeId, const char *city) {
     Vector resultPath = getBetterPath(path1, path2);
 
     if (resultPath == NULL || resultPath->numberOfElements == 0) {
+    	clear(resultPath);
         clear(path1);
         clear(path2);
         return false;
@@ -211,13 +250,16 @@ bool extendRoute(Map *map, unsigned routeId, const char *city) {
         resultPath = route->objects;
         route->objects = temp;
     }
+
     clear(path1);
     clear(path2);
     clear(resultPath);
+
     return true;
 }
 
 bool removeRoad(Map *map, const char *city1, const char *city2) {
+
     City c1 = getCity(city1, map->trieTree), c2 = getCity(city2, map->trieTree);
     if (c1 == NULL || c2 == NULL)
         return false;
@@ -236,22 +278,25 @@ bool removeRoad(Map *map, const char *city1, const char *city2) {
         Route route = getElement(r2->listOfRoutes, routeNumber);
         addElement(vectorOfFixes, fixRoute(route, r2));
     }
+
     bool isSomethingWrong = false;
     for (uint32_t i = 0; i < vectorOfFixes->numberOfElements; i++) {
         Vector currFix = getElement(vectorOfFixes, i);
-        if (currFix == NULL || currFix->numberOfElements == 0) {
+        if (currFix == NULL || currFix->numberOfElements % 2 == 0) {
             isSomethingWrong = true;
             break;
         }
         popBack(currFix);
         deleteByIndex(currFix, 0);
     }
+
     if (isSomethingWrong) {
         for (uint32_t i = 0; i < vectorOfFixes->numberOfElements; i++)
             clear(getElement(vectorOfFixes, i));
         clear(vectorOfFixes);
         return false;
     }
+
     for (uint32_t j = 0; j < vectorOfFixes->numberOfElements; j++) {
         Vector resultPath = getElement(vectorOfFixes, j);
         Route currRoute = NULL;
@@ -264,6 +309,7 @@ bool removeRoad(Map *map, const char *city1, const char *city2) {
             addElement(currEdge->listOfRoutes, currRoute);
         }
     }
+
     for (uint32_t i = 0; i < r1->listOfRoutes->numberOfElements; i++) {
         Route route = getElement(r1->listOfRoutes, i);
         uint32_t indexOfEdge = 1;
@@ -271,6 +317,7 @@ bool removeRoad(Map *map, const char *city1, const char *city2) {
             indexOfEdge+=2;
         replace(route->objects, indexOfEdge, getElement(vectorOfFixes, i));
     }
+
     for (uint32_t i = 0; i < r2->listOfRoutes->numberOfElements; i++) {
         Route route = getElement(r2->listOfRoutes, i);
         uint32_t indexOfEdge = 1;
@@ -278,6 +325,7 @@ bool removeRoad(Map *map, const char *city1, const char *city2) {
             indexOfEdge+=2;
         replace(route->objects, indexOfEdge, getElement(vectorOfFixes, r1->listOfRoutes->numberOfElements + i));
     }
+
     clear(vectorOfFixes);
     deleteByValue(c1->edges, r1);
     deleteByValue(c2->edges, r2);
@@ -287,11 +335,14 @@ bool removeRoad(Map *map, const char *city1, const char *city2) {
     free(r2);
     deleteCityIfEmpty(c1);
     deleteCityIfEmpty(c2);
+
     return true;
 }
 
 char const* getRouteDescription(Map *map, unsigned routeId) {
+
     Route route = NULL;
+
     for (uint32_t i = 0; i < map->routes->numberOfElements; i++) {
         Route currRoute = getElement(map->routes, i);
         if (currRoute->id == routeId) {
@@ -299,25 +350,34 @@ char const* getRouteDescription(Map *map, unsigned routeId) {
             break;
         }
     }
+
     if (route == NULL) {
         char* array = calloc(1, sizeof(char));
         return array;
     }
+
     uint32_t arrayLength = calcArrayLength(route->objects) + snprintf(NULL, 0, "%" PRIu32, route->id) + 1;
     char* arrayResult = calloc(arrayLength, sizeof(char));
     char* array = arrayResult;
+
     if (array == NULL)
         return NULL;
+
     sprintf(array, "%" PRIu32, route->id);
+
     while (*array != 0)
         array++;
+
     for (uint32_t i = 0; i < route->objects->numberOfElements; i++) {
-        sprintf(array, ";");
+
+    	sprintf(array, ";");
         array++;
+
         if (i % 2 == 0) {
             City currCity = getElement(route->objects, i);
             writeName(currCity->trieTree, &array);
         }
+
         else {
             Road currRoad = getElement(route->objects, i);
             sprintf(array, "%" PRIu32 ";%" PRId32, currRoad->length, currRoad->year);
@@ -325,5 +385,6 @@ char const* getRouteDescription(Map *map, unsigned routeId) {
                 array++;
         }
     }
+
     return arrayResult;
 }

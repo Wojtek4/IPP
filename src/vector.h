@@ -13,7 +13,6 @@ struct vector{
 Vector newVector();
 void addElement(Vector vector, void* element);
 void* getElement(Vector vector, uint32_t index);
-void swapWithLast(Vector vector, uint32_t index);
 void* popBack(Vector vector);
 void clear(Vector vector);
 void clearAndDelete(Vector vector);
