@@ -10,7 +10,7 @@ struct trieEdge {
     TrieTree node;
 };
 
-TrieEdge newTrieEdge(const char label, TrieTree node) {
+static TrieEdge newTrieEdge(const char label, TrieTree node) {
 
     TrieEdge result = malloc(sizeof(struct trieEdge));
     if (result == NULL)

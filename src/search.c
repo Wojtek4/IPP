@@ -3,11 +3,11 @@
 #include "search.h"
 #include <stdio.h>
 
-int32_t min(int32_t x1, int32_t x2) {
+static int32_t min(int32_t x1, int32_t x2) {
     return ((x1 < x2) ? x1 : x2);
 }
 
-void clearGraph(City c1, uint64_t setDistance) {
+static void clearGraph(City c1, uint64_t setDistance) {
 
     c1->distance = setDistance;
     c1->numberOfPaths = 0;
@@ -30,7 +30,7 @@ void clearGraph(City c1, uint64_t setDistance) {
     }
 }
 
-void findNumberOfPaths(City city, int minYear) {
+static void findNumberOfPaths(City city, int minYear) {
 
     for (uint32_t i = 0; i < city->edges->numberOfElements; i++) {
 
@@ -51,7 +51,7 @@ void findNumberOfPaths(City city, int minYear) {
     }
 }
 
-bool findRoute(City begin, City dest, Vector result, int minYear) {
+static bool findRoute(City begin, City dest, Vector result, int minYear) {
 
     if (begin == dest) {
         addElement(result, dest);

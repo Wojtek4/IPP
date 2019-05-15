@@ -67,7 +67,7 @@ void clear(Vector vector) {
     free(vector);
 }
 
-void swap(void** e1, void** e2) {
+static void swap(void** e1, void** e2) {
     void* tmp = *e1;
     *e1 = *e2;
     *e2 = tmp;

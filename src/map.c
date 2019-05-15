@@ -16,13 +16,6 @@ struct Map {
     TrieTree trieTree;
 };
 
-typedef struct trieEdge* TrieEdge;
-
-struct trieEdge {
-    char label;
-    TrieTree node;
-};
-
 Map* newMap() {
 
     Map* result = malloc(sizeof(Map));
@@ -55,7 +48,7 @@ void deleteMap(Map *map) {
     free(map);
 }
 
-bool badName(const char *city) {
+static bool badName(const char *city) {
 
 	if (*city == 0)
         return true;
@@ -70,7 +63,7 @@ bool badName(const char *city) {
     }
 }
 
-bool equalNames(const char *s1, const char *s2) {
+static bool equalNames(const char *s1, const char *s2) {
 
 	for (uint32_t i = 0; true; i++) {
 
@@ -82,7 +75,7 @@ bool equalNames(const char *s1, const char *s2) {
     }
 }
 
-Road findEdge(City v1, City v2) {
+static Road findEdge(City v1, City v2) {
 
 	Vector w1 = v1->edges;
 
