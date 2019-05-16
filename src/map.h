@@ -17,6 +17,11 @@
 
 typedef struct Map Map;
 
+/**
+ * Maksymalny możliwy numer drogi krajowej.
+ */
+static const unsigned MAX_ROUTE_ID = 999;
+
 /** @brief Tworzy nową strukturę.
  * Tworzy nową, pustą strukturę niezawierającą żadnych miast, odcinków dróg ani
  * dróg krajowych.
@@ -137,5 +142,26 @@ bool removeRoad(Map *map, const char *city1, const char *city2);
  * @return Wskaźnik na napis lub NULL, gdy nie udało się zaalokować pamięci.
  */
 char const* getRouteDescription(Map *map, unsigned routeId);
+
+/** @brief Dodaje drogę do drogi krajowej.
+ * Dodaje drogę od city1 do city2 (o ile istnieje) do drogi krajowej o numerze
+ * routeId (o ile istnieje).
+ * @param[in,out] map    – wskaźnik na strukturę przechowującą mapę dróg;
+ * @param[in] city1      - nazwa pierwszego miasta;
+ * @param[in] city2      - nazwa drugiego miasta;
+ * @param[in] routeId    – numer drogi krajowej.
+ * @return Void.
+ */
+void addRoadToRoute(Map *map, const char *city1, const char *city2, unsigned routeId);
+
+/** @brief Dodaje miasto do drogi krajowej.
+ * Dodaje miast (o ile istnieje) do drogi krajowej o numerze
+ * routeId. Jeśli ta droga krajowa nie istnieje, to ją tworzy.
+ * @param[in,out] map    – wskaźnik na strukturę przechowującą mapę dróg;
+ * @param[in] city1      - nazwa miasta;
+ * @param[in] routeId    – numer drogi krajowej.
+ * @return Void.
+ */
+void addCityToRoute(Map *map, const char *city1, unsigned routeId);
 
 #endif /* __MAP_H__ */

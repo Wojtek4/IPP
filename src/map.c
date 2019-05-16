@@ -9,8 +9,6 @@
 #include "route.h"
 #include "search.h"
 
-const int MAX_ROUTE_ID = 999;
-
 struct Map {
     Vector routes;
     TrieTree trieTree;
@@ -380,4 +378,46 @@ char const* getRouteDescription(Map *map, unsigned routeId) {
     }
 
     return arrayResult;
+}
+
+void addRoadToRoute(Map *map, const char *city1, const char *city2, unsigned routeId) {
+
+	Route route = NULL;
+
+	for (uint32_t i = 0; i < map->routes->numberOfElements; i++) {
+		Route currRoute = getElement(map->routes, i);
+		if (currRoute->id == routeId) {
+			route = currRoute;
+			break;
+		}
+	}
+
+	if (route == NULL)
+		return;
+
+	City c1 = getCity(city1, map->trieTree), c2 = getCity(city2, map->trieTree);
+	Road road = findEdge(c1, c2);
+
+	addElement(road->listOfRoutes, route);
+	addElement(route->objects, road);
+}
+
+void addCityToRoute(Map *map, const char *city1, unsigned routeId) {
+
+	Route route = NULL;
+
+	for (uint32_t i = 0; i < map->routes->numberOfElements; i++) {
+		Route currRoute = getElement(map->routes, i);
+		if (currRoute->id == routeId) {
+			route = currRoute;
+			break;
+		}
+	}
+
+	if (route == NULL)
+		route = newRouteStruct(routeId);
+
+	City c1 = getCity(city1, map->trieTree);
+
+	addElement(route->objects, c1);
 }
