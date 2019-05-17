@@ -106,7 +106,7 @@ void processLineFromInput(Map* m, uint32_t* numberOfLines) {
 
 		char* result = NULL;
 
-		if (strcmp(descriptionString, res->charsPtr) == 0)
+		if (strcmp(descriptionString, res->charsPtr) == 0 && routeNumber > 0 && routeNumber <= MAX_ROUTE_ID)
 			result = (char*)getRouteDescription(m, routeNumber);
 
 		if (result == NULL) {
