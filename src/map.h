@@ -51,7 +51,7 @@ void deleteMap(Map *map);
  * miastami już istnieje lub nie udało się zaalokować pamięci.
  */
 bool addRoad(Map *map, const char *city1, const char *city2,
-             unsigned length, int builtYear);
+			 unsigned length, int builtYear);
 
 /** @brief Modyfikuje rok ostatniego remontu odcinka drogi.
  * Dla odcinka drogi między dwoma miastami zmienia rok jego ostatniego remontu
@@ -86,7 +86,7 @@ bool repairRoad(Map *map, const char *city1, const char *city2, int repairYear);
  * się zaalokować pamięci.
  */
 bool newRoute(Map *map, unsigned routeId,
-              const char *city1, const char *city2);
+			  const char *city1, const char *city2);
 
 /** @brief Wydłuża drogę krajową do podanego miasta.
  * Dodaje do drogi krajowej nowe odcinki dróg do podanego miasta w taki sposób,

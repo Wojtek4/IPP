@@ -28,7 +28,7 @@ void addElement(Vector vector, void* element) {
 void* getElement(Vector vector, uint32_t index) {
 
 	if (index >= vector->numberOfElements)
-        return NULL;
+		return NULL;
 
 	return vector->array[index];
 }
@@ -38,7 +38,7 @@ void* popBack(Vector vector) {
 	if (vector->numberOfElements == 0)
 		return NULL;
 
-    void* result = vector->array[vector->numberOfElements - 1];
+	void* result = vector->array[vector->numberOfElements - 1];
 	vector->numberOfElements--;
 
 	if (vector->arraySize > 1 && vector->numberOfElements * 4 <= vector->arraySize) {
@@ -51,72 +51,72 @@ void* popBack(Vector vector) {
 
 void clearAndDelete(Vector vector) {
 
-    while(vector->numberOfElements > 0)
-        free(popBack(vector));
+	while(vector->numberOfElements > 0)
+		free(popBack(vector));
 
-    free(vector->array);
-    free(vector);
+	free(vector->array);
+	free(vector);
 }
 
 void clear(Vector vector) {
 
-    if (vector == NULL)
-        return;
+	if (vector == NULL)
+		return;
 
-    free(vector->array);
-    free(vector);
+	free(vector->array);
+	free(vector);
 }
 
 static void swap(void** e1, void** e2) {
-    void* tmp = *e1;
-    *e1 = *e2;
-    *e2 = tmp;
+	void* tmp = *e1;
+	*e1 = *e2;
+	*e2 = tmp;
 }
 
 void reverseVector(Vector vector) {
 
-    for (uint32_t i = 0; i * 2 < vector->numberOfElements; i++)
-        swap(vector->array + i, vector->array + vector->numberOfElements - 1 - i);
+	for (uint32_t i = 0; i * 2 < vector->numberOfElements; i++)
+		swap(vector->array + i, vector->array + vector->numberOfElements - 1 - i);
 }
 
 void replace(Vector vector, uint32_t index, Vector vectorToReplace) {
 
-    Vector secondPart = newVector();
+	Vector secondPart = newVector();
 
-    for (uint32_t i = index + 1; i < vector->numberOfElements; i++)
-        addElement(secondPart, getElement(vector, i));
+	for (uint32_t i = index + 1; i < vector->numberOfElements; i++)
+		addElement(secondPart, getElement(vector, i));
 
-    while(vector->numberOfElements > index)
-        popBack(vector);
+	while(vector->numberOfElements > index)
+		popBack(vector);
 
-    for (uint32_t i = 0; i < vectorToReplace->numberOfElements; i++)
-        addElement(vector, getElement(vectorToReplace, i));
+	for (uint32_t i = 0; i < vectorToReplace->numberOfElements; i++)
+		addElement(vector, getElement(vectorToReplace, i));
 
-    for (uint32_t i = 0; i < secondPart->numberOfElements; i++)
-        addElement(vector, getElement(secondPart, i));
+	for (uint32_t i = 0; i < secondPart->numberOfElements; i++)
+		addElement(vector, getElement(secondPart, i));
 
-    clear(secondPart);
-    clear(vectorToReplace);
+	clear(secondPart);
+	clear(vectorToReplace);
 }
 
 void deleteByIndex(Vector vector, uint32_t index) {
-    replace(vector, index, newVector());
+	replace(vector, index, newVector());
 }
 
 void deleteByValue(Vector vector, void* value) {
 
-    for (uint32_t i = 0; i < vector->numberOfElements; i++)
-        if (getElement(vector, i) == value)
-            return deleteByIndex(vector, i);
+	for (uint32_t i = 0; i < vector->numberOfElements; i++)
+		if (getElement(vector, i) == value)
+			return deleteByIndex(vector, i);
 }
 
 Vector copyVector(Vector vector) {
 
-    Vector res = newVector();
+	Vector res = newVector();
 
-    for (uint32_t i = 0; i < vector->numberOfElements; i++)
-        addElement(res, getElement(vector, i));
+	for (uint32_t i = 0; i < vector->numberOfElements; i++)
+		addElement(res, getElement(vector, i));
 
-    return res;
+	return res;
 }
 

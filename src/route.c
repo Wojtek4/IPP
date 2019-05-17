@@ -3,19 +3,19 @@
 
 Route newRouteStruct(uint32_t id) {
 
-    Route result = malloc(sizeof(struct route));
-    if (result == NULL)
-    	return NULL;
+	Route result = malloc(sizeof(struct route));
+	if (result == NULL)
+		return NULL;
 
-    result->objects = newVector();
-    if (result->objects == NULL) {
-    	free(result);
-    	return NULL;
-    }
+	result->objects = newVector();
+	if (result->objects == NULL) {
+		free(result);
+		return NULL;
+	}
 
-    result->id = id;
+	result->id = id;
 
-    return result;
+	return result;
 }
 
 void deleteRoute(Route route) {
@@ -23,6 +23,6 @@ void deleteRoute(Route route) {
 	if (route == NULL)
 		return;
 
-    clear(route->objects);
-    free(route);
+	clear(route->objects);
+	free(route);
 }

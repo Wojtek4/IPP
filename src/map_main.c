@@ -15,8 +15,8 @@ void error (const uint32_t* numberOfLines) {
 }
 
 char descriptionString[19] = "getRouteDescription",
-		repairString[10] = "repairRoad",
-		addString[7] = "addRoad";
+	repairString[10] = "repairRoad",
+	addString[7] = "addRoad";
 
 struct Word {
 	int32_t sizeOfCharsArray;
@@ -126,9 +126,9 @@ void processLineFromInput(Map* m, uint32_t* numberOfLines) {
 
 		if (strcmp(repairString, res->charsPtr) == 0 && repairYear <= INT32_MAX && repairYear >= INT32_MIN)
 			result = repairRoad(m,
-					getElement(pointersToSemicolons, 0) + 1,
-					getElement(pointersToSemicolons, 1) + 1,
-					(int)(repairYear));
+				getElement(pointersToSemicolons, 0) + 1,
+				getElement(pointersToSemicolons, 1) + 1,
+				(int)(repairYear));
 
 		if (result == false)
 			error(numberOfLines);
@@ -143,10 +143,10 @@ void processLineFromInput(Map* m, uint32_t* numberOfLines) {
 
 		if (builtYear <= INT32_MAX && builtYear >= INT32_MIN && length > 0 && length <= UINT32_MAX)
 			result = addRoad(m,
-							getElement(pointersToSemicolons, 0) + 1,
-							getElement(pointersToSemicolons, 1) + 1,
-							(unsigned) length,
-							(int)(builtYear));
+				getElement(pointersToSemicolons, 0) + 1,
+				getElement(pointersToSemicolons, 1) + 1,
+				(unsigned) length,
+				(int)(builtYear));
 
 		if (result == false)
 			error(numberOfLines);
@@ -161,22 +161,22 @@ void processLineFromInput(Map* m, uint32_t* numberOfLines) {
 			for (uint32_t i = 0; i + 3 < pointersToSemicolons->numberOfElements; i += 3) {
 
 				int64_t builtYear = stringToNumber(getElement(pointersToSemicolons, 3 * i + 2) + 1),
-						length = stringToNumber(getElement(pointersToSemicolons, 3 * i + 1) + 1);
+					length = stringToNumber(getElement(pointersToSemicolons, 3 * i + 1) + 1);
 
 				bool result = false;
 
 				if (builtYear <= INT32_MAX && builtYear >= INT32_MIN && length > 0 && length <= UINT32_MAX) {
 
 					addRoad(m,
-							getElement(pointersToSemicolons, 3 * i) + 1,
-							getElement(pointersToSemicolons, 3 * i + 3) + 1,
-							(unsigned) length,
-							(int)(builtYear));
+						getElement(pointersToSemicolons, 3 * i) + 1,
+						getElement(pointersToSemicolons, 3 * i + 3) + 1,
+						(unsigned) length,
+						(int)(builtYear));
 
 					result = repairRoad(m,
-										getElement(pointersToSemicolons, 3 * i) + 1,
-										getElement(pointersToSemicolons, 3 * i + 3) + 1,
-										(int)(builtYear));
+						getElement(pointersToSemicolons, 3 * i) + 1,
+						getElement(pointersToSemicolons, 3 * i + 3) + 1,
+						(int)(builtYear));
 				}
 
 				if (result == false) {
@@ -186,14 +186,14 @@ void processLineFromInput(Map* m, uint32_t* numberOfLines) {
 
 				if (i == 0)
 					addCityToRoute(m, getElement(pointersToSemicolons, 3 * i) + 1,
-							       route);
+					route);
 
 				addRoadToRoute(m, getElement(pointersToSemicolons, 3 * i) + 1,
-							   getElement(pointersToSemicolons, 3 * i + 3) + 1,
-							   route);
+					getElement(pointersToSemicolons, 3 * i + 3) + 1,
+					route);
 
 				addCityToRoute(m, getElement(pointersToSemicolons, 3 * i + 3) + 1,
-							   route);
+					route);
 			}
 		}
 	}

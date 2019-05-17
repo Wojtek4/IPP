@@ -6,20 +6,20 @@
 typedef struct trieEdge* TrieEdge;
 
 struct trieEdge {
-    char label;
-    TrieTree node;
+	char label;
+	TrieTree node;
 };
 
 static TrieEdge newTrieEdge(const char label, TrieTree node) {
 
-    TrieEdge result = malloc(sizeof(struct trieEdge));
-    if (result == NULL)
-    	return NULL;
+	TrieEdge result = malloc(sizeof(struct trieEdge));
+	if (result == NULL)
+		return NULL;
 
-    result->node = node;
-    result->label = label;
+	result->node = node;
+	result->label = label;
 
-    return result;
+	return result;
 }
 
 TrieTree newTrieNode(TrieTree parent) {
@@ -36,7 +36,7 @@ TrieTree newTrieNode(TrieTree parent) {
 }
 
 TrieTree newTrieRoot() {
-    return newTrieNode(NULL);
+	return newTrieNode(NULL);
 }
 
 TrieTree addPath(const char *history, TrieTree trieTree) {
@@ -45,26 +45,26 @@ TrieTree addPath(const char *history, TrieTree trieTree) {
 		TrieTree nextNode = NULL;
 
 		for (uint32_t i = 0; i < trieTree->t->numberOfElements; i++) {
-		    TrieEdge currEdge = (TrieEdge) getElement(trieTree->t, i);
-		    if (currEdge->label == *history) {
-                nextNode = currEdge->node;
-                break;
-            }
+			TrieEdge currEdge = (TrieEdge) getElement(trieTree->t, i);
+			if (currEdge->label == *history) {
+				nextNode = currEdge->node;
+				break;
+			}
 		}
 
 		if (nextNode == NULL) {
-		    nextNode = newTrieNode(trieTree);
-		    if (nextNode == NULL)
-		    	return NULL;
+			nextNode = newTrieNode(trieTree);
+			if (nextNode == NULL)
+				return NULL;
 
-		    TrieEdge newEdge = newTrieEdge(*history, nextNode);
-		    if (newEdge == NULL) {
-		    	deleteTrieTreeIfEmpty(nextNode);
-		    	return NULL;
-		    }
+			TrieEdge newEdge = newTrieEdge(*history, nextNode);
+			if (newEdge == NULL) {
+				deleteTrieTreeIfEmpty(nextNode);
+				return NULL;
+			}
 
-            addElement(trieTree->t, newEdge);
-        }
+			addElement(trieTree->t, newEdge);
+		}
 
 		trieTree = nextNode;
 		history++;
@@ -89,87 +89,89 @@ void removeTrie(TrieTree trieTree) {
 TrieTree findNode(const char *history, TrieTree trieTree) {
 
 	while (*history != 0) {
-	    bool stop = true;
-        for (uint32_t i = 0; i < trieTree->t->numberOfElements; i++) {
-            TrieEdge currEdge = getElement(trieTree->t, i);
-            if (currEdge->label == *history) {
-                trieTree = currEdge->node;
-                history++;
-                stop = false;
-                break;
-            }
-        }
-        if (stop) {
-            return NULL;
-        }
+		bool stop = true;
+		for (uint32_t i = 0; i < trieTree->t->numberOfElements; i++) {
+			TrieEdge currEdge = getElement(trieTree->t, i);
+			if (currEdge->label == *history) {
+				trieTree = currEdge->node;
+				history++;
+				stop = false;
+				break;
+			}
+		}
+		if (stop) {
+			return NULL;
+		}
 	}
 	return trieTree;
 }
 
 City getCity(const char *history, TrieTree trieTree) {
 
-    trieTree = findNode(history, trieTree);
+	trieTree = findNode(history, trieTree);
 
-    if (trieTree == NULL)
-        return NULL;
+	if (trieTree == NULL)
+		return NULL;
 
-    return trieTree->city;
+	return trieTree->city;
 }
 
 void deleteTrieTreeIfEmpty(TrieTree trieTree) {
 
-    if (trieTree->city == NULL && trieTree->t->numberOfElements == 0 && trieTree->parent != NULL) {
+	if (trieTree->city == NULL && trieTree->t->numberOfElements == 0 && trieTree->parent != NULL) {
 
-        TrieTree parent = trieTree->parent;
+		TrieTree parent = trieTree->parent;
 
-        for (uint32_t i = 0; i < parent->t->numberOfElements; i++) {
+		for (uint32_t i = 0; i < parent->t->numberOfElements; i++) {
 
-            TrieEdge edge = getElement(parent->t, i);
+			TrieEdge edge = getElement(parent->t, i);
 
-            if (edge->node == trieTree) {
+			if (edge->node == trieTree) {
 
-                clearAndDelete(trieTree->t);
-                free(trieTree);
-                deleteByIndex(parent->t, i);
+				clearAndDelete(trieTree->t);
+				free(trieTree);
 
-                return deleteTrieTreeIfEmpty(parent);
-            }
-        }
-    }
+				clear(getElement(parent->t, i));
+				deleteByIndex(parent->t, i);
+
+				return deleteTrieTreeIfEmpty(parent);
+			}
+		}
+	}
 }
 
 void writeName(TrieTree trieTree, char** array) {
 
-    if (trieTree->parent == NULL)
-        return;
+	if (trieTree->parent == NULL)
+		return;
 
-    TrieTree parent = trieTree->parent;
+	TrieTree parent = trieTree->parent;
 
-    for (uint32_t i = 0; i < parent->t->numberOfElements; i++) {
+	for (uint32_t i = 0; i < parent->t->numberOfElements; i++) {
 
-        TrieEdge edge = getElement(parent->t, i);
+		TrieEdge edge = getElement(parent->t, i);
 
-        if (edge->node == trieTree) {
+		if (edge->node == trieTree) {
 
-            writeName(parent, array);
+			writeName(parent, array);
 
-            **array = edge->label;
-            (*array)++;
+			**array = edge->label;
+			(*array)++;
 
-            return;
-        }
-    }
+			return;
+		}
+	}
 }
 
 uint32_t getNameLength(TrieTree trieTree) {
 
-    uint32_t res = 0;
+	uint32_t res = 0;
 
-    while (trieTree->parent != NULL) {
+	while (trieTree->parent != NULL) {
 
-        res++;
-        trieTree = trieTree->parent;
-    }
+		res++;
+		trieTree = trieTree->parent;
+	}
 
-    return res;
+	return res;
 }
