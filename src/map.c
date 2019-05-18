@@ -9,10 +9,6 @@
 #include "route.h"
 #include "search.h"
 
-struct Map {
-	Vector routes;
-	TrieTree trieTree;
-};
 
 Map* newMap() {
 
@@ -352,6 +348,7 @@ char const* getRouteDescription(Map *map, unsigned routeId) {
 	char* arrayResult = calloc(arrayLength, sizeof(char));
 	char* array = arrayResult;
 
+
 	if (array == NULL)
 		return NULL;
 
@@ -381,8 +378,7 @@ char const* getRouteDescription(Map *map, unsigned routeId) {
 	return arrayResult;
 }
 
-void addRoadToRoute(Map *map, const char *city1, const char *city2, unsigned routeId) {
-
+bool addRoadToRoute(Map *map, const char *city1, const char *city2, unsigned routeId) {
 	Route route = NULL;
 
 	for (uint32_t i = 0; i < map->routes->numberOfElements; i++) {
@@ -394,13 +390,20 @@ void addRoadToRoute(Map *map, const char *city1, const char *city2, unsigned rou
 	}
 
 	if (route == NULL)
-		return;
+		return false;
 
 	City c1 = getCity(city1, map->trieTree), c2 = getCity(city2, map->trieTree);
 	Road road = findEdge(c1, c2);
 
+	for (uint32_t i = 0; i < route->objects->numberOfElements; i+=2) {
+		if (c2 == getElement(route->objects, i)) {
+			return false;
+		}
+	}
+
 	addElement(road->listOfRoutes, route);
 	addElement(route->objects, road);
+	return true;
 }
 
 void addCityToRoute(Map *map, const char *city1, unsigned routeId) {

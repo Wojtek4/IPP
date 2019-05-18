@@ -10,12 +10,19 @@
 #define __MAP_H__
 
 #include <stdbool.h>
+#include "vector.h"
+#include "trie.h"
 
 /**
  * Struktura przechowująca mapę dróg krajowych.
  */
 
 typedef struct Map Map;
+
+struct Map {
+	Vector routes;
+	TrieTree trieTree;
+};
 
 /**
  * Maksymalny możliwy numer drogi krajowej.
@@ -150,9 +157,10 @@ char const* getRouteDescription(Map *map, unsigned routeId);
  * @param[in] city1      - nazwa pierwszego miasta;
  * @param[in] city2      - nazwa drugiego miasta;
  * @param[in] routeId    – numer drogi krajowej.
- * @return Void.
+ * @return True jeśli dodanie tej drogi nie popsułoby drogi krajowej; w przeciwnym
+ * wypadku false.
  */
-void addRoadToRoute(Map *map, const char *city1, const char *city2, unsigned routeId);
+bool addRoadToRoute(Map *map, const char *city1, const char *city2, unsigned routeId);
 
 /** @brief Dodaje miasto do drogi krajowej.
  * Dodaje miast (o ile istnieje) do drogi krajowej o numerze
