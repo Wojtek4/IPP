@@ -172,4 +172,6 @@ bool addRoadToRoute(Map *map, const char *city1, const char *city2, unsigned rou
  */
 void addCityToRoute(Map *map, const char *city1, unsigned routeId);
 
+bool removeRoute(Map *map, unsigned routeId);
+
 #endif /* __MAP_H__ */

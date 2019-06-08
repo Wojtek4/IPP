@@ -427,3 +427,29 @@ void addCityToRoute(Map *map, const char *city1, unsigned routeId) {
 
 	addElement(route->objects, c1);
 }
+
+bool removeRoute(Map *map, unsigned routeId) {
+
+	Route route = NULL;
+
+	for (uint32_t i = 0; i < map->routes->numberOfElements; i++) {
+		Route currRoute = getElement(map->routes, i);
+		if (currRoute->id == routeId) {
+			route = currRoute;
+			break;
+		}
+	}
+
+	if (route == NULL)
+		return false;
+
+	for (uint32_t i = 1; i < route->objects->numberOfElements; i += 2) {
+		Road currRoad = getElement(route->objects, i);
+		deleteByValue(currRoad->listOfRoutes, route);
+	}
+
+	deleteByValue(map->routes, route);
+	deleteRoute(route);
+
+	return true;
+}

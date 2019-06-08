@@ -15,9 +15,9 @@ void error (const uint32_t* numberOfLines) {
 	fprintf(stderr, "ERROR %" PRIu32 "\n", *numberOfLines);
 }
 
-char descriptionString[19] = "getRouteDescription",
-	repairString[10] = "repairRoad",
-	addString[7] = "addRoad";
+char descriptionString[] = "getRouteDescription",
+	repairString[] = "repairRoad",
+	addString[] = "addRoad";
 
 struct Word {
 	int32_t sizeOfCharsArray;
@@ -66,32 +66,34 @@ void processLineFromInput(Map* m, uint32_t* numberOfLines) {
 	Vector pointersToSemicolons = newVector();
 	int32_t numberOfSemicolons = 0;
 
-	while (firstChar == '#') {
+	while (firstChar == '#' || firstChar == '\n') {
 		(*numberOfLines)++;
-		while(firstChar != '\n')
+		while(firstChar != '\n' && firstChar != EOF)
 			firstChar = getchar();
-		firstChar = getchar();
+		if (firstChar != EOF)
+			firstChar = getchar();
 	}
 
 	if (firstChar == EOF) {
+		clear(pointersToSemicolons);
 		deleteMap(m);
 		exit(0);
 	}
 
 	WordPtr res = malloc(sizeof(struct Word));
-	res->charsPtr = malloc(sizeof(char));
 	res->numberOfChars = 0;
 	res->sizeOfCharsArray = 1;
+	res->charsPtr = malloc(sizeof(char) * res->sizeOfCharsArray);
 
-	while(firstChar != '\n') {
+	while(firstChar != '\n' && firstChar != EOF) {
 		addChar(res, firstChar);
 		firstChar = getchar();
 	}
-	addChar(res, 0);
+	addChar(res, '\0');
 
 	for (int32_t i = 0; i < res->numberOfChars; i++) {
 		if (res->charsPtr[i] == ';')
-			res->charsPtr[i] = 0, addElement(pointersToSemicolons, res->charsPtr + i);
+			res->charsPtr[i] = '\0', addElement(pointersToSemicolons, res->charsPtr + i);
 	}
 
 	numberOfSemicolons = pointersToSemicolons->numberOfElements;
@@ -219,6 +221,9 @@ void processLineFromInput(Map* m, uint32_t* numberOfLines) {
 	clearWord(res);
 
 	(*numberOfLines)++;
+
+	if (firstChar == EOF)
+		exit(0);
 }
 
 

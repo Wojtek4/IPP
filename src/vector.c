@@ -95,6 +95,11 @@ void replace(Vector vector, uint32_t index, Vector vectorToReplace) {
 	for (uint32_t i = 0; i < secondPart->numberOfElements; i++)
 		addElement(vector, getElement(secondPart, i));
 
+	if (vector->arraySize > 1 && vector->numberOfElements * 4 <= vector->arraySize) {
+		vector->arraySize /= 2;
+		vector->array = realloc(vector->array, vector->arraySize * sizeof(void *));
+	}
+
 	clear(secondPart);
 	clear(vectorToReplace);
 }
