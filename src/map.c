@@ -246,11 +246,7 @@ bool extendRoute(Map *map, unsigned routeId, const char *city) {
 	return true;
 }
 
-bool removeRoad(Map *map, const char *city1, const char *city2) {
-
-	City c1 = getCity(city1, map->trieTree), c2 = getCity(city2, map->trieTree);
-	if (c1 == NULL || c2 == NULL)
-		return false;
+bool removeRoadByCities(City c1, City c2) {
 
 	Road r1 = findEdge(c1, c2), r2 = findEdge(c2, c1);
 	if (r1 == NULL || r2 == NULL)
@@ -325,6 +321,15 @@ bool removeRoad(Map *map, const char *city1, const char *city2) {
 	deleteCityIfEmpty(c2);
 
 	return true;
+}
+
+bool removeRoad(Map *map, const char *city1, const char *city2) {
+
+	City c1 = getCity(city1, map->trieTree), c2 = getCity(city2, map->trieTree);
+	if (c1 == NULL || c2 == NULL)
+		return false;
+
+	return removeRoadByCities(c1, c2);
 }
 
 char const* getRouteDescription(Map *map, unsigned routeId) {
@@ -452,4 +457,50 @@ bool removeRoute(Map *map, unsigned routeId) {
 	deleteRoute(route);
 
 	return true;
+}
+
+void deleteRouteAndRoads(Map *map, unsigned routeId, Vector notNewRoads) {
+
+	//printf("OPEN\n");
+
+	Route route = NULL;
+
+	for (uint32_t i = 0; i < map->routes->numberOfElements; i++) {
+		Route currRoute = getElement(map->routes, i);
+		if (currRoute->id == routeId) {
+			route = currRoute;
+			break;
+		}
+	}
+
+
+	if (route == NULL)
+		return;
+
+	uint32_t ind = 0;
+
+	for (uint32_t i = 1; i + 1 < route->objects->numberOfElements; i += 2) {
+
+		City c1 = getElement(route->objects, i - 1), c2 = getElement(route->objects, i + 1);
+		Road currRoad = getElement(route->objects, i);
+		deleteByValue(currRoad->listOfRoutes, route);
+
+		//printf("KIKs %d %d\n", c1->minAge, c2->minAge);
+
+		if (ind < notNewRoads->numberOfElements && currRoad == getElement(notNewRoads, ind))
+			ind++;
+		else {
+			if (currRoad->listOfRoutes->numberOfElements != 0) {
+				printf("AAAAAAAA\n");
+			}
+			removeRoadByCities(c1, c2);
+		}
+
+		//printf("KIKS2\n");
+	}
+
+	deleteByValue(map->routes, route);
+	deleteRoute(route);
+
+	//printf("CLOSED\n");
 }

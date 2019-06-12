@@ -10,6 +10,7 @@
 #include "map.h"
 #include "vector.h"
 #include "route.h"
+#include "road.h"
 
 void error (const uint32_t* numberOfLines) {
 	fprintf(stderr, "ERROR %" PRIu32 "\n", *numberOfLines);
@@ -17,7 +18,12 @@ void error (const uint32_t* numberOfLines) {
 
 char descriptionString[] = "getRouteDescription",
 	repairString[] = "repairRoad",
-	addString[] = "addRoad";
+	addString[] = "addRoad",
+	newRouteString[] = "newRoute",
+	extendRouteString[] = "extendRoute",
+	removeRoadString[] = "removeRoad",
+	removeRouteString[] = "removeRoute",
+	zeroString[] = "0";
 
 struct Word {
 	int32_t sizeOfCharsArray;
@@ -60,11 +66,26 @@ int64_t stringToNumber(const char *s) {
 	}
 }
 
+static bool badName(const char *city) {
+
+	if (*city == 0)
+		return true;
+
+	for (uint32_t i = 0; true; i++) {
+
+		if (city[i] == 0)
+			return false;
+
+		if (city[i] == ';' || (city[i] < 32 && city[i] >= 0))
+			return true;
+	}
+}
+
 void processLineFromInput(Map* m, uint32_t* numberOfLines) {
 
 	int32_t firstChar = getchar();
 	Vector pointersToSemicolons = newVector();
-	int32_t numberOfSemicolons = 0;
+	uint32_t numberOfSemicolons = 0;
 
 	while (firstChar == '#' || firstChar == '\n') {
 		(*numberOfLines)++;
@@ -98,6 +119,24 @@ void processLineFromInput(Map* m, uint32_t* numberOfLines) {
 
 	numberOfSemicolons = pointersToSemicolons->numberOfElements;
 
+	/*printf("%d:\n", *numberOfLines);
+
+	for (uint32_t i = 0; i < m->routes->numberOfElements; i++) {
+		Route x = getElement(m->routes, i);
+		for (uint32_t j = 0; j < x->objects->numberOfElements; j+=2) {
+			City y = getElement(x->objects, j);
+			printf("%d ", y->minAge);
+		}
+		printf("\n");
+		for (uint32_t j = 1; j < x->objects->numberOfElements; j+=2) {
+			Road y = getElement(x->objects, j);
+			printf("%d ", y->year);
+		}
+		printf("\n\n");
+	}
+
+	printf("PO\n");*/
+
 	if (numberOfSemicolons == 0) {
 		error(numberOfLines);
 	}
@@ -106,49 +145,122 @@ void processLineFromInput(Map* m, uint32_t* numberOfLines) {
 
 		int64_t routeNumber = stringToNumber(getElement(pointersToSemicolons, 0) + 1);
 
-		char* result = NULL;
-
-		if (strcmp(descriptionString, res->charsPtr) == 0 && routeNumber > 0 && routeNumber <= MAX_ROUTE_ID)
-			result = (char*)getRouteDescription(m, routeNumber);
-
-		if (result == NULL) {
+		if (routeNumber < 0 ||
+			(strcmp(getElement(pointersToSemicolons, 0) + 1, zeroString) != 0 && routeNumber == 0)) {
 			error(numberOfLines);
 		}
+
+		else if (strcmp(descriptionString, res->charsPtr) == 0) {
+			char* result = (char*)getRouteDescription(m, routeNumber);
+
+			if (result == NULL) {
+				error(numberOfLines);
+			}
+			else {
+				printf("%s\n", result);
+				free(result);
+			}
+		}
+
+		else if (strcmp(removeRouteString, res->charsPtr) == 0) {
+			bool result = removeRoute(m, routeNumber);
+
+			if (result == false)
+				error(numberOfLines);
+		}
+
 		else {
-			printf("%s\n", result);
-			free(result);
+			error(numberOfLines);
+		}
+	}
+
+	else if (numberOfSemicolons == 2) {
+
+		if (strcmp(removeRoadString, res->charsPtr) == 0) {
+			bool result = removeRoad(m,
+					getElement(pointersToSemicolons, 0) + 1,
+					getElement(pointersToSemicolons, 1) + 1);
+
+			if (result == false)
+				error(numberOfLines);
+		}
+
+		else if (strcmp(extendRouteString, res->charsPtr) == 0) {
+
+			int64_t routeNumber = stringToNumber(getElement(pointersToSemicolons, 0) + 1);
+
+			if (routeNumber > 0 && routeNumber <= MAX_ROUTE_ID) {
+				bool result = extendRoute(m, routeNumber, getElement(pointersToSemicolons, 1) + 1);
+
+				if (result == false)
+					error(numberOfLines);
+			}
+			else {
+				error(numberOfLines);
+			}
+		}
+
+		else {
+			error(numberOfLines);
 		}
 	}
 
 	else if (numberOfSemicolons == 3) {
 
-		int64_t repairYear = stringToNumber(getElement(pointersToSemicolons, 2) + 1);
+		if (strcmp(newRouteString, res->charsPtr) == 0) {
 
-		bool result = false;
+			int64_t routeNumber = stringToNumber(getElement(pointersToSemicolons, 0) + 1);
 
-		if (strcmp(repairString, res->charsPtr) == 0 && repairYear <= INT32_MAX && repairYear >= INT32_MIN)
-			result = repairRoad(m,
-				getElement(pointersToSemicolons, 0) + 1,
-				getElement(pointersToSemicolons, 1) + 1,
-				(int)(repairYear));
+			if (routeNumber > 0 && routeNumber <= MAX_ROUTE_ID) {
+				bool result = newRoute(m,
+						routeNumber,
+						getElement(pointersToSemicolons, 1) + 1,
+						getElement(pointersToSemicolons, 2) + 1);
 
-		if (result == false)
-			error(numberOfLines);
+				if (result == false)
+					error(numberOfLines);
+			}
+			else {
+				error(numberOfLines);
+			}
+		}
+
+		else {
+
+			int64_t repairYear = stringToNumber(getElement(pointersToSemicolons, 2) + 1);
+
+			bool result = false;
+
+			if (strcmp(repairString, res->charsPtr) == 0 && repairYear <= INT32_MAX && repairYear >= INT32_MIN)
+				result = repairRoad(m,
+									getElement(pointersToSemicolons, 0) + 1,
+									getElement(pointersToSemicolons, 1) + 1,
+									(int) (repairYear));
+
+			/*printf("POCZATEK\n");
+			for (int32_t i = 0; i < numberOfSemicolons; i++) {
+				printf("%s[]", getElement(pointersToSemicolons, i));
+			}
+			printf("\nKONIEC\n");*/
+
+			if (result == false)
+				error(numberOfLines);
+		}
 	}
 
 	else if (numberOfSemicolons == 4 && strcmp(res->charsPtr, addString) == 0) {
 
 		int64_t builtYear = stringToNumber(getElement(pointersToSemicolons, 3) + 1),
-			length = stringToNumber(getElement(pointersToSemicolons, 2) + 1);
+				length = stringToNumber(getElement(pointersToSemicolons, 2) + 1);
 
 		bool result = false;
 
 		if (builtYear <= INT32_MAX && builtYear >= INT32_MIN && length > 0 && length <= UINT32_MAX)
 			result = addRoad(m,
-				getElement(pointersToSemicolons, 0) + 1,
-				getElement(pointersToSemicolons, 1) + 1,
-				(unsigned) length,
-				(int)(builtYear));
+							 getElement(pointersToSemicolons, 0) + 1,
+							 getElement(pointersToSemicolons, 1) + 1,
+							 (unsigned) length,
+							 (int)(builtYear));
 
 		if (result == false)
 			error(numberOfLines);
@@ -168,52 +280,198 @@ void processLineFromInput(Map* m, uint32_t* numberOfLines) {
 			}
 		}
 
-		if (isNew && route > 0 && route <= MAX_ROUTE_ID) {
+		if (!isNew || route <= 0 || route > MAX_ROUTE_ID) {
+			error(numberOfLines);
+		}
+
+		else {
+			bool isAllGood = true;
+
+			TrieTree namesOfCities = newTrieRoot();
+
+			City setAsPresent = (City)1;
+
+			for (uint32_t i = 0; i < numberOfSemicolons; i += 3) {
+				if (badName(getElement(pointersToSemicolons, i) + 1)) {
+					isAllGood = false;
+					break;
+				}
+
+				TrieTree trieTree = addPath(getElement(pointersToSemicolons, i) + 1, namesOfCities);
+				if (trieTree->city == setAsPresent)
+					isAllGood = false;
+				trieTree->city = setAsPresent;
+			}
+
+			//printf("%d ", isAllGood);
+
+			for (uint32_t i = 0; i < numberOfSemicolons; i += 3) {
+				if (badName(getElement(pointersToSemicolons, i) + 1)) {
+					isAllGood = false;
+					break;
+				}
+
+				TrieTree trieTree = findNode(getElement(pointersToSemicolons, i) + 1, namesOfCities);
+				trieTree->city = NULL;
+			}
+
+			removeTrie(namesOfCities);
+
+			//printf("%d ", isAllGood);
+
+			for (uint32_t i = 0; i + 3 < numberOfSemicolons; i += 3) {
+
+				int64_t builtYear = stringToNumber(getElement(pointersToSemicolons, i + 2) + 1),
+						length = stringToNumber(getElement(pointersToSemicolons, i + 1) + 1);
+
+				if (!(builtYear <= INT32_MAX && builtYear >= INT32_MIN && builtYear != 0
+					&& length > 0 && length <= UINT32_MAX))
+					isAllGood = false;
+
+				City c1 = getCity(getElement(pointersToSemicolons, i) + 1, m->trieTree),
+					c2 = getCity(getElement(pointersToSemicolons, i + 3) + 1, m->trieTree);
+				if (c1 == NULL || c2 == NULL)
+					continue;
+
+				Road r1 = NULL;
+				for (uint32_t j = 0; j < c1->edges->numberOfElements; j++) {
+					Road currRoad = getElement(c1->edges, j);
+					if (currRoad->destination == c2) {
+						r1 = currRoad;
+						break;
+					}
+				}
+
+				//printf("YEAR: %ld LENGTH: %ld\n", builtYear, length);
+
+				if (r1 != NULL && (r1->length != length || r1->year > builtYear))
+					isAllGood = false;
+			}
+
+			//printf("%d ", isAllGood);
+
+			if (isAllGood == false) {
+				error(numberOfLines);
+			}
+			else {
+
+				//printf("POSZLO\n");
+
+				for (uint32_t i = 0; i + 3 < pointersToSemicolons->numberOfElements; i += 3) {
+
+					//printf("i=%d\n", i);
+
+					int64_t builtYear = stringToNumber(getElement(pointersToSemicolons, i + 2) + 1),
+							length = stringToNumber(getElement(pointersToSemicolons, i + 1) + 1);
+
+					addRoad(m,
+							getElement(pointersToSemicolons, i) + 1,
+							getElement(pointersToSemicolons, i + 3) + 1,
+							(unsigned) length,
+							(int)(builtYear));
+
+					repairRoad(m,
+							getElement(pointersToSemicolons, i) + 1,
+							getElement(pointersToSemicolons, i + 3) + 1,
+							(int)(builtYear));
+
+					if (i == 0)
+						addCityToRoute(m, getElement(pointersToSemicolons, i) + 1,
+									   route);
+
+					addRoadToRoute(m,
+							getElement(pointersToSemicolons, i) + 1,
+							getElement(pointersToSemicolons, i + 3) + 1,
+							route);
+
+					addCityToRoute(m, getElement(pointersToSemicolons, i + 3) + 1,
+								   route);
+
+					//printf("KOTLET\n");
+				}
+			}
+		}
+
+
+		/*if (isNew && route > 0 && route <= MAX_ROUTE_ID) {
+
+			Vector notNewRoads = newVector();
 
 			for (uint32_t i = 0; i + 3 < pointersToSemicolons->numberOfElements; i += 3) {
 
+				//printf("i=%d\n", i);
+
 				int64_t builtYear = stringToNumber(getElement(pointersToSemicolons, i + 2) + 1),
-					length = stringToNumber(getElement(pointersToSemicolons, i + 1) + 1);
+						length = stringToNumber(getElement(pointersToSemicolons, i + 1) + 1);
+
+				City c1 = getCity(getElement(pointersToSemicolons, i) + 1, m->trieTree),
+					c2 = getCity(getElement(pointersToSemicolons, i + 3) + 1, m->trieTree);
+
+				if (c1 != NULL && c2 != NULL)
+					for (uint32_t j = 0; j < c1->edges->numberOfElements; j++) {
+						Road currRoad = getElement(c1->edges, j);
+						if (currRoad->destination == c2) {
+							addElement(notNewRoads, currRoad);
+							break;
+						}
+					}
 
 				bool result = false;
+
+				//printf("MASLO\n");
 
 				if (builtYear <= INT32_MAX && builtYear >= INT32_MIN && length > 0 && length <= UINT32_MAX) {
 
 					addRoad(m,
-						getElement(pointersToSemicolons, i) + 1,
-						getElement(pointersToSemicolons, i + 3) + 1,
-						(unsigned) length,
-						(int)(builtYear));
+							getElement(pointersToSemicolons, i) + 1,
+							getElement(pointersToSemicolons, i + 3) + 1,
+							(unsigned) length,
+							(int)(builtYear));
 
 					result = repairRoad(m,
-						getElement(pointersToSemicolons, i) + 1,
-						getElement(pointersToSemicolons, i + 3) + 1,
-						(int)(builtYear));
+										getElement(pointersToSemicolons, i) + 1,
+										getElement(pointersToSemicolons, i + 3) + 1,
+										(int)(builtYear));
 				}
 
 				if (result == false) {
+					removeRoad(m,
+							   getElement(pointersToSemicolons, i) + 1,
+							   getElement(pointersToSemicolons, i + 3) + 1);
+					//printf("MLEKO\n");
+					deleteRouteAndRoads(m, route, notNewRoads);
 					error(numberOfLines);
 					break;
 				}
 
 				if (i == 0)
 					addCityToRoute(m, getElement(pointersToSemicolons, i) + 1,
-					route);
+								   route);
 
-				if (addRoadToRoute(m, getElement(pointersToSemicolons, i) + 1,
-					getElement(pointersToSemicolons, i + 3) + 1,
-					route) == false) {
+				bool addToRoute = addRoadToRoute(m,
+												 getElement(pointersToSemicolons, i) + 1,
+												 getElement(pointersToSemicolons, i + 3) + 1,
+												 route);
+				if (!addToRoute) {
+					removeRoad(m,
+							   getElement(pointersToSemicolons, i) + 1,
+							   getElement(pointersToSemicolons, i + 3) + 1);
+					deleteRouteAndRoads(m, route, notNewRoads);
 					error(numberOfLines);
 					break;
 				}
 
 				addCityToRoute(m, getElement(pointersToSemicolons, i + 3) + 1,
 					route);
+
+				//printf("KOTLET\n");
 			}
+
+			clear(notNewRoads);
 		}
 		else {
 			error(numberOfLines);
-		}
+		}*/
 	}
 	else
 		error(numberOfLines);

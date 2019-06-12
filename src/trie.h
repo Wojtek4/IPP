@@ -8,12 +8,6 @@ struct TrieNode;
 #include "vector.h"
 #include "city.h"
 
-/* TrieNode is a node of trie tree. It stores ptr - pointer
-to its DsuNode container - a dsu node witch contains this
-TrieNode; orderInDsu - index of this trie node in *ptr;
-t - array of children of this trie node, t[x] is connected to
-this node with a vertex labeled by x + 32 */
-
 struct TrieNode {
 	City city;
 	Vector t;

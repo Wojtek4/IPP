@@ -131,7 +131,7 @@ void deleteTrieTreeIfEmpty(TrieTree trieTree) {
 				clearAndDelete(trieTree->t);
 				free(trieTree);
 
-				clear(getElement(parent->t, i));
+				free(getElement(parent->t, i));
 				deleteByIndex(parent->t, i);
 
 				return deleteTrieTreeIfEmpty(parent);
