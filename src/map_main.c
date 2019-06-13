@@ -127,7 +127,7 @@ void processLineFromInput(Map* m, uint32_t* numberOfLines) {
 
 		int64_t routeNumber = stringToNumber(getElement(pointersToSemicolons, 0) + 1);
 
-		if (routeNumber < 0 ||
+		if (routeNumber < 0 || routeNumber > UINT32_MAX ||
 			(strcmp(getElement(pointersToSemicolons, 0) + 1, zeroString) != 0 && routeNumber == 0)) {
 			error(numberOfLines);
 		}
