@@ -12,11 +12,11 @@
 #include "route.h"
 #include "road.h"
 
-void error (const uint32_t* numberOfLines) {
+static void error (const uint32_t* numberOfLines) {
 	fprintf(stderr, "ERROR %" PRIu32 "\n", *numberOfLines);
 }
 
-char descriptionString[] = "getRouteDescription",
+static char descriptionString[] = "getRouteDescription",
 	repairString[] = "repairRoad",
 	addString[] = "addRoad",
 	newRouteString[] = "newRoute",
@@ -33,12 +33,12 @@ struct Word {
 
 typedef struct Word* WordPtr;
 
-void clearWord(WordPtr word) {
+static void clearWord(WordPtr word) {
 	free(word->charsPtr);
 	free(word);
 }
 
-void addChar(WordPtr word, char c) {
+static void addChar(WordPtr word, char c) {
 	if (word->sizeOfCharsArray == word->numberOfChars) {
 		word->sizeOfCharsArray *= 2;
 		word->charsPtr = realloc(word->charsPtr, sizeof(char) * word->sizeOfCharsArray);
@@ -47,7 +47,7 @@ void addChar(WordPtr word, char c) {
 	word->charsPtr[word->numberOfChars++] = c;
 }
 
-int64_t stringToNumber(const char *s) {
+static int64_t stringToNumber(const char *s) {
 
 	if (strlen(s) > 12)
 		return 0;
@@ -81,7 +81,7 @@ static bool badName(const char *city) {
 	}
 }
 
-void processLineFromInput(Map* m, uint32_t* numberOfLines) {
+static void processLineFromInput(Map* m, uint32_t* numberOfLines) {
 
 	int32_t firstChar = getchar();
 	Vector pointersToSemicolons = newVector();

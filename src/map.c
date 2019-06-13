@@ -9,7 +9,6 @@
 #include "route.h"
 #include "search.h"
 
-
 Map* newMap() {
 
 	Map* result = malloc(sizeof(Map));
