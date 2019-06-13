@@ -171,7 +171,7 @@ bool newRoute(Map *map, unsigned routeId, const char *city1, const char *city2) 
 		return false;
 	}
 
-	for (uint32_t i = 1; i < result->objects->numberOfElements; i+=2) {
+	for (uint32_t i = 1; i < result->objects->numberOfElements; i += 2) {
 		Road currEdge = getElement(result->objects, i);
 		addElement(currEdge->listOfRoutes, result);
 	}
@@ -221,7 +221,7 @@ bool extendRoute(Map *map, unsigned routeId, const char *city) {
 		return false;
 	}
 
-	for (uint32_t i = 1; i < resultPath->numberOfElements; i+=2) {
+	for (uint32_t i = 1; i < resultPath->numberOfElements; i += 2) {
 		Road currEdge = getElement(resultPath, i);
 		addElement(currEdge->listOfRoutes, route);
 	}
@@ -353,7 +353,6 @@ char const* getRouteDescription(Map *map, unsigned routeId) {
 	char* arrayResult = calloc(arrayLength, sizeof(char));
 	char* array = arrayResult;
 
-
 	if (array == NULL)
 		return NULL;
 
@@ -400,7 +399,7 @@ bool addRoadToRoute(Map *map, const char *city1, const char *city2, unsigned rou
 	City c1 = getCity(city1, map->trieTree), c2 = getCity(city2, map->trieTree);
 	Road road = findEdge(c1, c2);
 
-	for (uint32_t i = 0; i < route->objects->numberOfElements; i+=2) {
+	for (uint32_t i = 0; i < route->objects->numberOfElements; i += 2) {
 		if (c2 == getElement(route->objects, i)) {
 			return false;
 		}
@@ -457,50 +456,4 @@ bool removeRoute(Map *map, unsigned routeId) {
 	deleteRoute(route);
 
 	return true;
-}
-
-void deleteRouteAndRoads(Map *map, unsigned routeId, Vector notNewRoads) {
-
-	//printf("OPEN\n");
-
-	Route route = NULL;
-
-	for (uint32_t i = 0; i < map->routes->numberOfElements; i++) {
-		Route currRoute = getElement(map->routes, i);
-		if (currRoute->id == routeId) {
-			route = currRoute;
-			break;
-		}
-	}
-
-
-	if (route == NULL)
-		return;
-
-	uint32_t ind = 0;
-
-	for (uint32_t i = 1; i + 1 < route->objects->numberOfElements; i += 2) {
-
-		City c1 = getElement(route->objects, i - 1), c2 = getElement(route->objects, i + 1);
-		Road currRoad = getElement(route->objects, i);
-		deleteByValue(currRoad->listOfRoutes, route);
-
-		//printf("KIKs %d %d\n", c1->minAge, c2->minAge);
-
-		if (ind < notNewRoads->numberOfElements && currRoad == getElement(notNewRoads, ind))
-			ind++;
-		else {
-			if (currRoad->listOfRoutes->numberOfElements != 0) {
-				printf("AAAAAAAA\n");
-			}
-			removeRoadByCities(c1, c2);
-		}
-
-		//printf("KIKS2\n");
-	}
-
-	deleteByValue(map->routes, route);
-	deleteRoute(route);
-
-	//printf("CLOSED\n");
 }

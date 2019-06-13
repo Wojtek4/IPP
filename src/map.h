@@ -174,6 +174,4 @@ void addCityToRoute(Map *map, const char *city1, unsigned routeId);
 
 bool removeRoute(Map *map, unsigned routeId);
 
-void deleteRouteAndRoads(Map *map, unsigned routeId, Vector notNewRoads);
-
 #endif /* __MAP_H__ */

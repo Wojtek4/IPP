@@ -119,24 +119,6 @@ void processLineFromInput(Map* m, uint32_t* numberOfLines) {
 
 	numberOfSemicolons = pointersToSemicolons->numberOfElements;
 
-	/*printf("%d:\n", *numberOfLines);
-
-	for (uint32_t i = 0; i < m->routes->numberOfElements; i++) {
-		Route x = getElement(m->routes, i);
-		for (uint32_t j = 0; j < x->objects->numberOfElements; j+=2) {
-			City y = getElement(x->objects, j);
-			printf("%d ", y->minAge);
-		}
-		printf("\n");
-		for (uint32_t j = 1; j < x->objects->numberOfElements; j+=2) {
-			Road y = getElement(x->objects, j);
-			printf("%d ", y->year);
-		}
-		printf("\n\n");
-	}
-
-	printf("PO\n");*/
-
 	if (numberOfSemicolons == 0) {
 		error(numberOfLines);
 	}
@@ -237,12 +219,6 @@ void processLineFromInput(Map* m, uint32_t* numberOfLines) {
 									getElement(pointersToSemicolons, 1) + 1,
 									(int) (repairYear));
 
-			/*printf("POCZATEK\n");
-			for (int32_t i = 0; i < numberOfSemicolons; i++) {
-				printf("%s[]", getElement(pointersToSemicolons, i));
-			}
-			printf("\nKONIEC\n");*/
-
 			if (result == false)
 				error(numberOfLines);
 		}
@@ -303,8 +279,6 @@ void processLineFromInput(Map* m, uint32_t* numberOfLines) {
 				trieTree->city = setAsPresent;
 			}
 
-			//printf("%d ", isAllGood);
-
 			for (uint32_t i = 0; i < numberOfSemicolons; i += 3) {
 				if (badName(getElement(pointersToSemicolons, i) + 1)) {
 					isAllGood = false;
@@ -316,8 +290,6 @@ void processLineFromInput(Map* m, uint32_t* numberOfLines) {
 			}
 
 			removeTrie(namesOfCities);
-
-			//printf("%d ", isAllGood);
 
 			for (uint32_t i = 0; i + 3 < numberOfSemicolons; i += 3) {
 
@@ -342,24 +314,16 @@ void processLineFromInput(Map* m, uint32_t* numberOfLines) {
 					}
 				}
 
-				//printf("YEAR: %ld LENGTH: %ld\n", builtYear, length);
-
 				if (r1 != NULL && (r1->length != length || r1->year > builtYear))
 					isAllGood = false;
 			}
-
-			//printf("%d ", isAllGood);
 
 			if (isAllGood == false) {
 				error(numberOfLines);
 			}
 			else {
 
-				//printf("POSZLO\n");
-
 				for (uint32_t i = 0; i + 3 < pointersToSemicolons->numberOfElements; i += 3) {
-
-					//printf("i=%d\n", i);
 
 					int64_t builtYear = stringToNumber(getElement(pointersToSemicolons, i + 2) + 1),
 							length = stringToNumber(getElement(pointersToSemicolons, i + 1) + 1);
@@ -386,92 +350,9 @@ void processLineFromInput(Map* m, uint32_t* numberOfLines) {
 
 					addCityToRoute(m, getElement(pointersToSemicolons, i + 3) + 1,
 								   route);
-
-					//printf("KOTLET\n");
 				}
 			}
 		}
-
-
-		/*if (isNew && route > 0 && route <= MAX_ROUTE_ID) {
-
-			Vector notNewRoads = newVector();
-
-			for (uint32_t i = 0; i + 3 < pointersToSemicolons->numberOfElements; i += 3) {
-
-				//printf("i=%d\n", i);
-
-				int64_t builtYear = stringToNumber(getElement(pointersToSemicolons, i + 2) + 1),
-						length = stringToNumber(getElement(pointersToSemicolons, i + 1) + 1);
-
-				City c1 = getCity(getElement(pointersToSemicolons, i) + 1, m->trieTree),
-					c2 = getCity(getElement(pointersToSemicolons, i + 3) + 1, m->trieTree);
-
-				if (c1 != NULL && c2 != NULL)
-					for (uint32_t j = 0; j < c1->edges->numberOfElements; j++) {
-						Road currRoad = getElement(c1->edges, j);
-						if (currRoad->destination == c2) {
-							addElement(notNewRoads, currRoad);
-							break;
-						}
-					}
-
-				bool result = false;
-
-				//printf("MASLO\n");
-
-				if (builtYear <= INT32_MAX && builtYear >= INT32_MIN && length > 0 && length <= UINT32_MAX) {
-
-					addRoad(m,
-							getElement(pointersToSemicolons, i) + 1,
-							getElement(pointersToSemicolons, i + 3) + 1,
-							(unsigned) length,
-							(int)(builtYear));
-
-					result = repairRoad(m,
-										getElement(pointersToSemicolons, i) + 1,
-										getElement(pointersToSemicolons, i + 3) + 1,
-										(int)(builtYear));
-				}
-
-				if (result == false) {
-					removeRoad(m,
-							   getElement(pointersToSemicolons, i) + 1,
-							   getElement(pointersToSemicolons, i + 3) + 1);
-					//printf("MLEKO\n");
-					deleteRouteAndRoads(m, route, notNewRoads);
-					error(numberOfLines);
-					break;
-				}
-
-				if (i == 0)
-					addCityToRoute(m, getElement(pointersToSemicolons, i) + 1,
-								   route);
-
-				bool addToRoute = addRoadToRoute(m,
-												 getElement(pointersToSemicolons, i) + 1,
-												 getElement(pointersToSemicolons, i + 3) + 1,
-												 route);
-				if (!addToRoute) {
-					removeRoad(m,
-							   getElement(pointersToSemicolons, i) + 1,
-							   getElement(pointersToSemicolons, i + 3) + 1);
-					deleteRouteAndRoads(m, route, notNewRoads);
-					error(numberOfLines);
-					break;
-				}
-
-				addCityToRoute(m, getElement(pointersToSemicolons, i + 3) + 1,
-					route);
-
-				//printf("KOTLET\n");
-			}
-
-			clear(notNewRoads);
-		}
-		else {
-			error(numberOfLines);
-		}*/
 	}
 	else
 		error(numberOfLines);

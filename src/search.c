@@ -138,7 +138,7 @@ Vector findPath(City c1, City c2) {
 
 void changePath(Vector objects, bool isAllowed, uint32_t startingPosition, uint32_t bias) {
 
-	for (uint32_t i = startingPosition; i + bias < objects->numberOfElements; i+=2) {
+	for (uint32_t i = startingPosition; i + bias < objects->numberOfElements; i += 2) {
 		City currCity = getElement(objects, i);
 		currCity->isAllowed = isAllowed;
 	}
@@ -160,7 +160,7 @@ Vector fixRoute(Route route, Road road) {
 	Vector objects = route->objects;
 	City c1 = NULL, c2 = NULL;
 
-	for (uint32_t i = 1; i < objects->numberOfElements; i+=2) {
+	for (uint32_t i = 1; i < objects->numberOfElements; i += 2) {
 		if (getElement(objects, i) == road) {
 			c1 = getElement(objects, i - 1);
 			c2 = getElement(objects, i + 1);
@@ -199,13 +199,13 @@ Vector getBetterPath(Vector path1, Vector path2) {
 	int64_t lengthOfPath1 = 0, lengthOfPath2 = 0;
 	int minOfPath1 = INT32_MAX, minOfPath2 = INT32_MAX;
 
-	for (uint32_t i = 1; i + 1 < path1->numberOfElements; i+=2) {
+	for (uint32_t i = 1; i + 1 < path1->numberOfElements; i += 2) {
 		Road currEdge = getElement(path1, i);
 		minOfPath1 = min(minOfPath1, currEdge->year);
 		lengthOfPath1 += currEdge->length;
 	}
 
-	for (uint32_t i = 1; i + 1 < path2->numberOfElements; i+=2) {
+	for (uint32_t i = 1; i + 1 < path2->numberOfElements; i += 2) {
 		Road currEdge = getElement(path2, i);
 		minOfPath2 = min(minOfPath2, currEdge->year);
 		lengthOfPath2 += currEdge->length;
@@ -232,12 +232,12 @@ uint32_t calcArrayLength(Vector objects) {
 
 	uint32_t length = 0;
 
-	for (uint32_t i = 0; i < objects->numberOfElements; i+=2) {
+	for (uint32_t i = 0; i < objects->numberOfElements; i += 2) {
 		City currCity = getElement(objects, i);
 		length += getNameLength(currCity->trieTree) + 1;
 	}
 
-	for (uint32_t i = 1; i < objects->numberOfElements; i+=2) {
+	for (uint32_t i = 1; i < objects->numberOfElements; i += 2) {
 		Road currRoad = getElement(objects, i);
 		length += snprintf(NULL, 0, ";%" PRIu32 ";%" PRId32, currRoad->length, currRoad->year);
 	}
